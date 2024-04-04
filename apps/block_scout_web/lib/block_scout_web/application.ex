@@ -9,11 +9,12 @@ defmodule BlockScoutWeb.Application do
   alias BlockScoutWeb.Counters.{BlocksIndexedCounter, InternalTransactionsIndexedCounter}
   alias BlockScoutWeb.{Endpoint, Prometheus}
   alias BlockScoutWeb.{MainPageRealtimeEventHandler, RealtimeEventHandler, SmartContractRealtimeEventHandler}
+  alias BlockScoutWeb.Utility.EventHandlersMetrics
 
   def start(_type, _args) do
     import Supervisor
 
-    Prometheus.Instrumenter.setup()
+    Prometheus.PhoenixInstrumenter.setup()
     Prometheus.Exporter.setup()
 
     APILogger.message(
@@ -38,7 +39,8 @@ defmodule BlockScoutWeb.Application do
       {RealtimeEventHandler, name: RealtimeEventHandler},
       {SmartContractRealtimeEventHandler, name: SmartContractRealtimeEventHandler},
       {BlocksIndexedCounter, name: BlocksIndexedCounter},
-      {InternalTransactionsIndexedCounter, name: InternalTransactionsIndexedCounter}
+      {InternalTransactionsIndexedCounter, name: InternalTransactionsIndexedCounter},
+      {EventHandlersMetrics, []}
     ]
 
     opts = [strategy: :one_for_one, name: BlockScoutWeb.Supervisor, max_restarts: 1_000]
